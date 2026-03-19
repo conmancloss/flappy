@@ -79,24 +79,7 @@ body {
 
 .hidden { display: none !important; }
 
-/* ═══ SYNC INDICATOR ═══ */
-.sync-indicator {
-  position: fixed; top: 80px; right: 1rem; z-index: 9000;
-  display: flex; align-items: center; gap: 0.5rem;
-  background: rgba(10,28,58,0.92); backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border-hi); border-radius: var(--radius-xl);
-  padding: 0.4rem 1rem; font-size: 0.78rem; font-weight: 700;
-  animation: slideIn 0.3s ease;
-}
-@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-.sync-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--orange-400);
-  animation: pulse 1s ease infinite;
-}
-.sync-dot.synced { background: var(--green-400); animation: none; }
-.sync-dot.error  { background: var(--red-400); animation: none; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
 
 /* ═══ NOVA BANNER ═══ */
 #nova-banner {
@@ -211,6 +194,7 @@ body {
 .slot-emoji { font-size:0.95rem; min-width:18px; text-align:center; }
 .slot-name { font-weight:800; font-size:0.74rem; color:var(--text-primary); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .slot-name.tbd { color:var(--text-tertiary); font-style:italic; font-weight:600; }
+.slot-record { font-size:0.58rem; font-weight:700; color:var(--text-tertiary); background:rgba(255,255,255,0.08); border-radius:4px; padding:1px 4px; white-space:nowrap; }
 .slot-score { font-family:'Bangers',cursive; font-size:1.05rem; color:var(--orange-100); min-width:22px; text-align:center; }
 .slot-score.winner-score { color:var(--orange-400); }
 .match-status-bar { font-size:0.58rem; font-weight:800; letter-spacing:1.2px; text-align:center; padding:0.22rem; background:rgba(255,255,255,0.03); color:var(--text-tertiary); text-transform:uppercase; border-top:1px solid rgba(255,255,255,0.05); }
@@ -331,7 +315,8 @@ body {
 .lb-rank.gold-text { color:#fbbf24; }
 .lb-rank.silver-text { color:#94a3b8; }
 .lb-rank.bronze-text { color:#b45309; }
-.lb-team { display:flex; align-items:center; gap:0.5rem; font-weight:800; }
+.lb-team { display:flex; align-items:center; gap:0.5rem; font-weight:800; flex-wrap:wrap; }
+.lb-prerecord { font-size:0.6rem; font-weight:700; color:var(--text-tertiary); background:rgba(255,255,255,0.08); border-radius:4px; padding:1px 5px; white-space:nowrap; }
 .lb-stat { text-align:center; font-size:0.85rem; }
 .lb-stat-val { font-family:'Bangers',cursive; font-size:1.2rem; color:var(--orange-300); }
 .lb-stat-label { font-size:0.6rem; color:var(--text-tertiary); letter-spacing:1px; text-transform:uppercase; }
@@ -346,22 +331,9 @@ body {
 .history-time { font-size:0.7rem; color:var(--text-tertiary); white-space:nowrap; }
 .history-note { font-size:0.78rem; color:var(--text-secondary); font-style:italic; width:100%; margin-top:0.3rem; }
 
-/* ═══ SYNC STATUS ═══ */
-.sync-status-card { display:flex; align-items:center; gap:0.75rem; padding:0.75rem 1rem; background:rgba(255,255,255,0.04); border:1px solid var(--glass-border); border-radius:var(--radius-md); font-size:0.88rem; font-weight:700; }
-.sync-dot-lg { width:12px; height:12px; border-radius:50%; background:var(--orange-400); animation:pulse 1s ease infinite; }
-.sync-dot-lg.online { background:var(--green-400); animation:none; }
-.sync-dot-lg.offline { background:var(--red-400); animation:none; }
 
-/* ═══ SPECTATOR MODE ═══ */
-.spectator-overlay { position:fixed; inset:0; z-index:8000; background:var(--blue-900); display:flex; flex-direction:column; background-image:radial-gradient(ellipse 110% 70% at 30% -5%,rgba(34,86,199,0.55) 0%,transparent 65%); }
-.spectator-header { display:flex; align-items:center; justify-content:center; padding:1.5rem 2rem; gap:1rem; border-bottom:1px solid var(--glass-border); position:relative; }
-.spec-logo { width:50px; height:50px; border-radius:12px; object-fit:cover; }
-.spec-title { font-family:'Bangers',cursive; font-size:clamp(1.5rem,4vw,3rem); letter-spacing:4px; text-shadow:3px 3px 0 var(--orange-400); }
-.spec-exit { position:absolute; right:1.5rem; background:rgba(255,255,255,0.1); border:1px solid var(--glass-border); border-radius:var(--radius-xl); color:var(--text-secondary); font-weight:700; font-size:0.85rem; padding:0.4rem 1rem; cursor:pointer; font-family:'Nunito',sans-serif; }
-#spec-bracket { flex:1; overflow:auto; padding:2rem; display:flex; justify-content:center; }
-.spec-ticker { padding:0.75rem 2rem; background:rgba(0,0,0,0.5); border-top:1px solid var(--glass-border); font-family:'Bangers',cursive; font-size:1.1rem; letter-spacing:3px; color:var(--orange-300); white-space:nowrap; overflow:hidden; }
-.spec-ticker-inner { display:inline-block; animation:ticker 20s linear infinite; }
-@keyframes ticker { from{transform:translateX(100vw)} to{transform:translateX(-100%)} }
+
+
 
 /* ═══ MODALS ═══ */
 .modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.65); backdrop-filter:blur(8px) saturate(150%); display:flex; align-items:center; justify-content:center; padding:1rem; animation:overlayIn 0.2s ease; }
