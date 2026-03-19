@@ -19,11 +19,6 @@
   </div>
 </div>
 
-<!-- SYNC STATUS -->
-<div id="sync-indicator" class="sync-indicator hidden">
-  <span class="sync-dot"></span><span id="sync-label">Syncing...</span>
-</div>
-
 <!-- APP -->
 <div id="app" class="hidden">
 
@@ -51,7 +46,7 @@
       <button class="nav-btn" id="btn-leaderboard" onclick="showPage('leaderboard')">📊 Stats</button>
       <button class="nav-btn" id="btn-history"    onclick="showPage('history')">📋 History</button>
       <button class="nav-btn" id="btn-settings"   onclick="showPage('settings')">⚙︎ Settings</button>
-      <button class="nav-btn" id="btn-tv"         onclick="enterSpectatorMode()" title="TV/Projector Mode">📺</button>
+
     </div>
   </nav>
 
@@ -135,17 +130,10 @@
       <div id="team-roster-list"></div>
       <button class="btn-secondary mt-8" onclick="openAddTeamModal()">+ Add Team</button>
     </div>
-    <div class="glass-card">
-      <h3 class="card-title">☁ Cloud Sync</h3>
-      <p class="about-text" style="margin-bottom:1rem;">All changes sync live to the cloud — anyone with this page open sees updates in real time.</p>
-      <div class="sync-status-card" id="sync-status-card">
-        <span class="sync-dot-lg" id="sync-dot-lg"></span>
-        <span id="sync-status-text">Checking connection...</span>
-      </div>
-    </div>
+
     <div class="glass-card">
       <h3 class="card-title">About</h3>
-      <p class="about-text">🐔 Crossy Road Tournament Manager v4<br>Live sync · Stats · History · Spectator mode · Timers</p>
+      <p class="about-text">🐔 Crossy Road Tournament Manager v5<br>Leaderboard · History · Timers · Sound · Confetti · Undo · Check-in · Print</p>
     </div>
   </div>
 
@@ -215,15 +203,6 @@
 
 </div><!-- /app -->
 
-<!-- SPECTATOR OVERLAY -->
-<div id="spectator-overlay" class="spectator-overlay hidden">
-  <div class="spectator-header">
-    <img class="spec-logo" src="data:image/webp;base64,UklGRr4HAABXRUJQVlA4WAoAAAAgAAAAkAAAkAAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZWUDgg0AUAAFAiAJ0BKpEAkQA+nUKaSKWkIqEuuWo4sBOJQHkJm7hvXTmb8Nzi/VPg/pyrV7evzAeb56VP836TPUtbzhQ3fAztZmThDGKt/O9/ZrsQit3LOrAZ97fds2rJD75wWdhs2NsyK30Iv++QQTkb7/UMk2+dVDBYo6C38fgkUQpLuLZ8/77z/7gsGvsF4EOsAyiX/pI4tFdOtoBodw+aECm4erk1ZRR0Y2MPfH+FNQ6khrP/CsrIseQ4qJzT6MAuecwW5dgCQ3Pvjce+LmAKgQDvTj6gaoABUxeAsMV/CHdveLgNFiucr/0kdk4yCZpayzlQ7AyZZngE6dda+ZVtkC+KHR4jiJRfiVho8yEXvfCO/iikDgRNxKx5YyaUQugA/u69n8kbgbxP/8gx0NcEyCXNcuBQWcPbGKbJS3A3vIh4f4/6WGKUHlmaBhSPS6yaghga4/LCP65qa937FhMcXPT6s5LVlCpaSwD2/MAOED6nzy53fLXGXKl6W1xLc4vlI9/yHIv5+Xd7seh8zWjUNwgNFSN229MUc4aaK4mv3YQ3ArHei6FWg3Gp4HssAf4hMBMXjDsO4VHBNnvuGOvJlvf+87T0Y+RMlAHZt/2fv486oMBV4UZvJbFFwqUPe8xvru5mxZcPIt79gqxrlQZ7tUJDktID5E0X9Zuex7mS6xdRJi2zWSgfV1Qz3IGD/cXurHYnsVUC7Qx0d+AWfu5vrysTIZa3DkrPcwfpVNYV1AbXqswIRJ1afnAKRF0F9i96xayRGI45rAdb//dEMfEoBYNGeeltKHiDzha73h/VmS2FCt+VBtbBwiKrUG95/qThKK56Fg8fUbWNEIWDbX1WnJksSBgkJCkyxHrjFWqel+lyT5xYnrTimUczp2pduN8KZF+qvV2qjzNm/1lXLRbkIwG4nAlXnmKKzsopnWVtL/ilkpI7tO/5+jDY/HCIeDk+j77WQr++J/CAA8bBUbhSfpWB7VNu8kAb18Xl4jvzZgIrDqNjMsSmI6M0R3AHzhox9yPS+e9YqgBBxlzxgIha+iCjPMja4qEQo+l7KiIbaQl10V8V1LYM8FFhTz0XIKDOIzH79UvAXRjRYchmYSl9RVktN5dtb4hFjdx8adHhiFjx9nvcX0kpYdh4RjX/Sr+kcjNtvnfYucp+ZGpxxibPhIIvljzBDYQGZmtD3eg6Ri3JlAET6gL1fqQRxSXvycv6feuZ/i743NLw9Go/OywLB6NQWIOQQLuhQianbu3GzncGQXkt6cvifMSDywqevTKF/NT2vruvvnfVExoJ1eO7fFK+U4flmGpQZGEUJAVsE33ROfUiJ9ibjltD0bV2+tS203S0BDDFpli7KLhIyGs8MSFNuxjHOsSe2Wr2oPXgbXSuVhtx17qBeHeb07ZuHPuw5KjH010MxHG6RKxIcQtbz3JkxcumqNMFELT5TDR8IaZj9yHc2S8JWO05DgoloIlWzDWA+uYMLrUOdxAyx1lrgSW9qXWEAhM/Py9Du9Xhl5gBMhbqtU8Xl/1TOgRgCJkWEv8iynxsevD4WOluSWlkejKtIsDUmsnbQuz1VpPYCVLpqztrO9ze7SNMa+KS/INJ2OVH5RRgtiUhsxEzEsRUyocQ/9K0Z1E9JXVozPwb4ylrw4hF+QytiA4zgoR+FWvREoHccDrISOs6fkdEIimEkMFuxSN6w8w5GJPoTCUi1lG5Nb4kNSBRfkPDIVwcvI2+7sxeS01FmVaoOjuj4G2OKxmT0bYhDIBnoDn+vy7aDURo86kltgVTqaF5HHgRGxCSft8sYc1PhEDE+D7+IXSz0SKm7MyOKkhJCvbSxZv1MU/y+vMjb1Ime+MgXGTQbYiMIWrahTMA8UE8tBR4zGnSR+6ddFgLHzYZup9oRXAdHrUXNYYHSPHWkbp+DUzMig0ZkyODT2gZwwcxD68dzmmnG5X/zq4DKczpYgNTrNjuwL96rPBif/UEgw2mUmMsny2AF8EAAA==" alt="CR"/>
-    <h1 class="spec-title">CROSSY ROAD TOURNAMENT</h1>
-    <button class="spec-exit" onclick="exitSpectatorMode()">✕ Exit</button>
-  </div>
-  <div id="spec-bracket"></div>
-  <div class="spec-ticker" id="spec-ticker"></div>
 </div>
 
 <!-- CONFETTI CANVAS -->
