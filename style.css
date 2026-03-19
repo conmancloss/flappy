@@ -385,3 +385,175 @@ body {
   .lb-row,.lb-header { grid-template-columns:30px 1fr 50px 50px 50px; }
   .lb-row > *:last-child,.lb-header > *:last-child { display:none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PRE-SEASON MODE STYLES
+══════════════════════════════════════════════════════════════ */
+
+/* Toggle switch */
+.preseason-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row !important;
+}
+.toggle-label {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background: var(--surface-raised);
+  border-radius: 28px;
+  transition: background 0.2s;
+  border: 1.5px solid var(--border-subtle);
+}
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+
+/* Pre-season options panel */
+.preseason-options {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1.5px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.preseason-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+.preseason-status {
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--surface-raised);
+  border-radius: 10px;
+  border: 1.5px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.ps-status-info { display: flex; flex-direction: column; gap: 2px; }
+.ps-status-badge {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--green-400, #4ade80);
+}
+.ps-status-meta {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Modal size */
+.modal-lg {
+  max-width: 560px;
+  width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* Aggregate standings table */
+.ps-agg-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.2rem;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.ps-standings-table {
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+.ps-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 36px 36px 52px 40px 40px 46px;
+  background: var(--surface-raised);
+  padding: 6px 10px;
+  font-weight: 800;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  gap: 4px;
+}
+.ps-table-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 36px 36px 52px 40px 40px 46px;
+  padding: 7px 10px;
+  gap: 4px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s;
+}
+.ps-table-row:last-child { border-bottom: none; }
+.ps-table-row:hover { background: var(--surface-raised); }
+
+/* Inner (per-season) table — fewer columns */
+.ps-inner .ps-table-header,
+.ps-inner .ps-table-row {
+  grid-template-columns: 36px 1fr 36px 36px 40px 40px;
+}
+
+.ps-rank { font-weight: 800; font-size: 0.9rem; }
+.ps-team-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-stat { text-align: center; font-variant-numeric: tabular-nums; }
+.ps-wins { font-weight: 800; color: var(--green-400, #4ade80); }
+.ps-diff { font-weight: 800; }
+
+/* Gold/silver/bronze rows */
+.ps-gold   { background: rgba(251,191,36,0.07); }
+.ps-silver { background: rgba(148,163,184,0.07); }
+.ps-bronze { background: rgba(180,120,60,0.07); }
+
+/* Per-season collapsible */
+.ps-season-details {
+  margin-bottom: 0.5rem;
+}
+.ps-season-title {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 6px 4px;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ps-season-title::-webkit-details-marker { display: none; }
+.ps-season-title::before { content: '▶'; font-size: 0.6rem; transition: transform 0.15s; }
+details[open] .ps-season-title::before { transform: rotate(90deg); }
+
+.ps-apply-note {
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  padding: 0.6rem 0;
+  text-align: center;
+}

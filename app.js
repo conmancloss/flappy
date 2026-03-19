@@ -10,11 +10,12 @@ const SAVE_KEY = 'crossy_tournament_v5';
 
 // ─── State ───────────────────────────────────────────────────
 let state = {
-  settings: { name: 'Crossy Road Cup', numTeams: 8, date: '', location: '', timerSecs: 0 },
+  settings: { name: 'Crossy Road Cup', numTeams: 8, date: '', location: '', timerSecs: 0, preseasonEnabled: false, preseasonGames: 10, preseasonSeasons: 3, preseasonHCA: 5 },
   teams:    [],
   matches:  [],
   history:  [],   // { id, round, roundName, teamA, teamB, emojiA, emojiB, scoreA, scoreB, winnerId, winnerName, winnerEmoji, timestamp, notes }
   checkins: {},   // { teamId: true/false }
+  preseason: null, // { seasons: [...], standings: [...], appliedAt: timestamp }
   currentMatchId: null
 };
 
@@ -66,6 +67,7 @@ function loadState() {
     state.matches  = p.matches  || [];
     state.history  = p.history  || [];
     state.checkins = p.checkins || {};
+    state.preseason = p.preseason || null;
   } catch(e) { console.warn('loadState failed', e); }
 }
 
@@ -335,6 +337,15 @@ function renderSettings() {
   document.getElementById('setting-date').value     = state.settings.date      || '';
   document.getElementById('setting-location').value = state.settings.location  || '';
   document.getElementById('setting-timer').value    = state.settings.timerSecs || 0;
+
+  // Pre-season settings
+  const psEnabled = document.getElementById('setting-preseason');
+  psEnabled.checked = state.settings.preseasonEnabled || false;
+  document.getElementById('preseason-options').classList.toggle('hidden', !psEnabled.checked);
+  document.getElementById('preseason-games').value   = state.settings.preseasonGames   || 10;
+  document.getElementById('preseason-seasons').value = state.settings.preseasonSeasons || 3;
+  document.getElementById('preseason-hca').value     = state.settings.preseasonHCA != null ? state.settings.preseasonHCA : 5;
+  renderPreseasonStatus();
   renderRoster();
 }
 
@@ -344,6 +355,11 @@ function saveSettings() {
   state.settings.date      = document.getElementById('setting-date').value;
   state.settings.location  = document.getElementById('setting-location').value.trim();
   state.settings.timerSecs = parseInt(document.getElementById('setting-timer').value)             || 0;
+
+  state.settings.preseasonEnabled = document.getElementById('setting-preseason').checked;
+  state.settings.preseasonGames   = parseInt(document.getElementById('preseason-games').value)   || 10;
+  state.settings.preseasonSeasons = parseInt(document.getElementById('preseason-seasons').value) || 3;
+  state.settings.preseasonHCA     = parseInt(document.getElementById('preseason-hca').value)     || 0;
 
   if (state.teams.length > state.settings.numTeams) {
     state.teams = state.teams.slice(0, state.settings.numTeams);
@@ -714,4 +730,211 @@ function showToast(msg, type = 'info') {
 // ─── Helpers ──────────────────────────────────────────────────
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PRE-SEASON MODE
+// ══════════════════════════════════════════════════════════════
+
+function togglePreseasonMode() {
+  const enabled = document.getElementById('setting-preseason').checked;
+  document.getElementById('preseason-options').classList.toggle('hidden', !enabled);
+}
+
+function renderPreseasonStatus() {
+  const statusEl = document.getElementById('preseason-status');
+  if (!statusEl) return;
+  if (!state.preseason) { statusEl.classList.add('hidden'); return; }
+  const st = state.preseason;
+  statusEl.classList.remove('hidden');
+  statusEl.innerHTML = `
+    <div class="ps-status-info">
+      <span class="ps-status-badge">✅ Pre-season complete</span>
+      <span class="ps-status-meta">${st.seasons.length} season${st.seasons.length > 1 ? 's' : ''} · ${st.totalGames} games simulated</span>
+      ${st.appliedAt ? '<span class="ps-status-meta">Seeds applied ✓</span>' : ''}
+    </div>
+    <button class="btn-secondary btn-sm" onclick="showPreseasonResults()">📊 View Results</button>`;
+}
+
+// ── Simulation Engine ─────────────────────────────────────────
+function simulateGame(teamA, teamB, hcaBonus) {
+  const n = state.teams.length || 1;
+  const strA = (n + 1 - (teamA.seed || n)) / n;
+  const strB = (n + 1 - (teamB.seed || n)) / n;
+  const adjustedA = Math.max(0.05, strA + (hcaBonus / 100));
+  const total = adjustedA + Math.max(0.05, strB);
+  const probA = adjustedA / total;
+  const aWins = Math.random() < probA;
+  const winScore  = 8 + Math.floor(Math.random() * 8);
+  const lossScore = Math.floor(Math.random() * winScore);
+  return {
+    scoreA: aWins ? winScore : lossScore,
+    scoreB: aWins ? lossScore : winScore,
+    winner: aWins ? teamA.id : teamB.id
+  };
+}
+
+function generateRoundRobin(teams, gamesPerTeam, hcaBonus) {
+  const n = teams.length;
+  if (n < 2) return [];
+  const allMatchups = [];
+  for (let i = 0; i < n; i++)
+    for (let j = i + 1; j < n; j++)
+      allMatchups.push([teams[i], teams[j]]);
+
+  const shuffled = [...allMatchups].sort(() => Math.random() - 0.5);
+  const maxGames = Math.ceil(gamesPerTeam * n / 2);
+  const schedule = [];
+  for (let g = 0; g < maxGames; g++) {
+    const pair = shuffled[g % shuffled.length];
+    const [home, away] = Math.random() < 0.5 ? pair : [pair[1], pair[0]];
+    const result = simulateGame(home, away, hcaBonus);
+    schedule.push({ homeId: home.id, awayId: away.id, ...result });
+  }
+  return schedule;
+}
+
+function computeStandings(teams, games) {
+  const stats = {};
+  teams.forEach(t => {
+    stats[t.id] = { id: t.id, name: t.name, emoji: t.emoji || '🐔', seed: t.seed,
+                    wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, gamesPlayed: 0 };
+  });
+  games.forEach(g => {
+    const home = stats[g.homeId], away = stats[g.awayId];
+    if (!home || !away) return;
+    home.ptsFor += g.scoreA; home.ptsAgainst += g.scoreB; home.gamesPlayed++;
+    away.ptsFor += g.scoreB; away.ptsAgainst += g.scoreA; away.gamesPlayed++;
+    if (g.winner === g.homeId) { home.wins++; away.losses++; }
+    else                       { away.wins++; home.losses++; }
+  });
+  return Object.values(stats).sort((a, b) =>
+    b.wins - a.wins ||
+    (b.ptsFor - b.ptsAgainst) - (a.ptsFor - a.ptsAgainst) ||
+    b.ptsFor - a.ptsFor
+  );
+}
+
+function runPreseason() {
+  if (state.teams.length < 2) {
+    showToast('Need at least 2 teams to run pre-season!', 'error'); return;
+  }
+  snapshot();
+  const gamesPerTeam = parseInt(document.getElementById('preseason-games').value)   || 10;
+  const numSeasons   = parseInt(document.getElementById('preseason-seasons').value) || 3;
+  const hcaBonus     = parseInt(document.getElementById('preseason-hca').value)     || 0;
+
+  const seasons = [];
+  let totalGames = 0;
+
+  for (let s = 0; s < numSeasons; s++) {
+    const games = generateRoundRobin(state.teams, gamesPerTeam, hcaBonus);
+    const standings = computeStandings(state.teams, games);
+    seasons.push({ seasonNum: s + 1, games, standings, gamesPlayed: games.length });
+    totalGames += games.length;
+  }
+
+  // Aggregate across all seasons
+  const agg = {};
+  state.teams.forEach(t => {
+    agg[t.id] = { id: t.id, name: t.name, emoji: t.emoji || '🐔',
+                  wins: 0, losses: 0, ptsFor: 0, ptsAgainst: 0, gamesPlayed: 0 };
+  });
+  seasons.forEach(s => s.standings.forEach(row => {
+    if (!agg[row.id]) return;
+    agg[row.id].wins       += row.wins;
+    agg[row.id].losses     += row.losses;
+    agg[row.id].ptsFor     += row.ptsFor;
+    agg[row.id].ptsAgainst += row.ptsAgainst;
+    agg[row.id].gamesPlayed+= row.gamesPlayed;
+  }));
+
+  const aggregateStandings = Object.values(agg).sort((a, b) =>
+    b.wins - a.wins ||
+    (b.ptsFor - b.ptsAgainst) - (a.ptsFor - a.ptsAgainst) ||
+    b.ptsFor - a.ptsFor
+  );
+
+  state.preseason = { seasons, aggregateStandings, totalGames, appliedAt: null,
+                      settings: { gamesPerTeam, numSeasons, hcaBonus } };
+  saveState();
+  renderPreseasonStatus();
+  showPreseasonResults();
+  showToast('🏅 Pre-season complete! ' + totalGames + ' games simulated.', 'success');
+}
+
+function showPreseasonResults() {
+  if (!state.preseason) return;
+  const ps = state.preseason;
+
+  let html = `<div class="ps-agg-title">📊 Combined Standings (${ps.seasons.length} Season${ps.seasons.length > 1 ? 's' : ''})</div>`;
+  html += `<div class="ps-standings-table">
+    <div class="ps-table-header">
+      <span>Rank</span><span>Team</span><span>W</span><span>L</span><span>Win%</span><span>PF</span><span>PA</span><span>Diff</span>
+    </div>`;
+
+  ps.aggregateStandings.forEach((row, i) => {
+    const winPct = row.gamesPlayed > 0 ? ((row.wins / row.gamesPlayed) * 100).toFixed(1) : '0.0';
+    const diff = row.ptsFor - row.ptsAgainst;
+    const rankEmoji = ['🥇','🥈','🥉'][i] || ('#'+(i+1));
+    const rankClass = ['ps-gold','ps-silver','ps-bronze'][i] || '';
+    html += `<div class="ps-table-row ${rankClass}">
+      <span class="ps-rank">${rankEmoji}</span>
+      <span class="ps-team-name">${row.emoji} ${escHtml(row.name)}</span>
+      <span class="ps-stat ps-wins">${row.wins}</span>
+      <span class="ps-stat">${row.losses}</span>
+      <span class="ps-stat">${winPct}%</span>
+      <span class="ps-stat">${row.ptsFor}</span>
+      <span class="ps-stat">${row.ptsAgainst}</span>
+      <span class="ps-stat ps-diff" style="color:${diff>=0?'var(--green-400)':'var(--red-400)'}">${diff>=0?'+':''}${diff}</span>
+    </div>`;
+  });
+  html += '</div>';
+
+  ps.seasons.forEach(s => {
+    html += `<details class="ps-season-details">
+      <summary class="ps-season-title">Season ${s.seasonNum} — ${s.gamesPlayed} games</summary>
+      <div class="ps-standings-table ps-inner">
+        <div class="ps-table-header"><span>Rank</span><span>Team</span><span>W</span><span>L</span><span>PF</span><span>PA</span></div>`;
+    s.standings.forEach((row, i) => {
+      html += `<div class="ps-table-row">
+        <span class="ps-rank">${i+1}</span>
+        <span class="ps-team-name">${row.emoji} ${escHtml(row.name)}</span>
+        <span class="ps-stat ps-wins">${row.wins}</span>
+        <span class="ps-stat">${row.losses}</span>
+        <span class="ps-stat">${row.ptsFor}</span>
+        <span class="ps-stat">${row.ptsAgainst}</span>
+      </div>`;
+    });
+    html += '</div></details>';
+  });
+
+  html += `<div class="ps-apply-note">✨ Click <strong>Apply Seeds to Bracket</strong> to use these standings as bracket seedings.</div>`;
+  document.getElementById('preseason-results-content').innerHTML = html;
+  openModal('modal-preseason-results');
+}
+
+function applyPreseasonSeeds() {
+  if (!state.preseason) return;
+  snapshot();
+  state.preseason.aggregateStandings.forEach((row, i) => {
+    const team = state.teams.find(t => t.id === row.id);
+    if (team) { team.seed = i + 1; team.preWins = row.wins; team.preLosses = row.losses; }
+  });
+  renumber();
+  state.preseason.appliedAt = new Date().toISOString();
+  saveState();
+  buildBracket();
+  renderSettings();
+  showToast('🏅 Pre-season seeds applied! Bracket updated.', 'success');
+  playSound('win');
+}
+
+function clearPreseason() {
+  if (!state.preseason) { showToast('No pre-season data to clear.', 'info'); return; }
+  snapshot();
+  state.preseason = null;
+  saveState();
+  renderPreseasonStatus();
+  showToast('Pre-season data cleared.', 'info');
 }
