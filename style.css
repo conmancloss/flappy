@@ -557,3 +557,267 @@ details[open] .ps-season-title::before { transform: rotate(90deg); }
   padding: 0.6rem 0;
   text-align: center;
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PRE-SEASON PAGE STYLES
+══════════════════════════════════════════════════════════════ */
+
+/* Nav button accent for pre-season */
+.nav-btn-preseason { color: var(--accent) !important; }
+.nav-btn-preseason.active { background: linear-gradient(135deg, #f97316, #f59e0b) !important; color: #fff !important; }
+
+/* Season tab bar */
+.ps-season-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 var(--page-pad, 1rem) 0.5rem;
+  margin-bottom: 0.25rem;
+}
+.ps-tab {
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 2px solid var(--border-subtle);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.82rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+}
+.ps-tab:hover { border-color: var(--accent); color: var(--accent); }
+.ps-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ps-tab.done   { opacity: 0.7; }
+.ps-tab-badge  { background: rgba(0,0,0,0.15); border-radius: 10px; padding: 1px 7px; font-size: 0.72rem; }
+.ps-tab.active .ps-tab-badge { background: rgba(255,255,255,0.25); }
+.ps-tab-agg { background: linear-gradient(135deg, #f59e0b22, #f9731622); border-color: #f59e0b; color: #f59e0b; }
+.ps-tab-agg.active { background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; border-color: transparent; }
+
+/* Games header with filter */
+.ps-games-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ps-games-filter { display: flex; gap: 4px; }
+.ps-filter-btn {
+  padding: 3px 12px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-subtle);
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: 'Nunito', sans-serif;
+}
+.ps-filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ps-filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Game card */
+.ps-game-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border-subtle);
+  background: var(--surface-raised);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+}
+.ps-game-card:hover { border-color: var(--accent); transform: translateX(2px); }
+.ps-game-card.ps-game-done { opacity: 0.7; }
+.ps-game-card.ps-game-done:hover { opacity: 1; }
+
+.ps-game-num {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-tertiary);
+  width: 28px;
+  flex-shrink: 0;
+  text-align: center;
+}
+.ps-game-teams {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.ps-game-team {
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ps-game-team.ps-winner-team { color: var(--accent); font-weight: 900; }
+.ps-game-vs {
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.ps-game-score {
+  font-family: 'Bangers', cursive;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  flex-shrink: 0;
+}
+.ps-game-status {
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+/* Season action buttons */
+.ps-season-actions {
+  padding: 0 var(--page-pad, 1rem) 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+.btn-lg { padding: 14px 28px; font-size: 1rem; }
+
+/* All-done complete banner */
+.ps-complete-banner {
+  display: flex;
+  justify-content: center;
+  padding: 1rem var(--page-pad, 1rem) 2rem;
+}
+.ps-complete-inner {
+  background: linear-gradient(135deg, #f59e0b22, #f9731622);
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+}
+.ps-complete-trophy { font-size: 3rem; margin-bottom: 0.5rem; }
+.ps-complete-inner h3 { font-family: 'Bangers', cursive; font-size: 1.8rem; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+.ps-complete-inner p  { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.2rem; }
+.ps-agg-in-banner { margin-top: 1.2rem; text-align: left; }
+.ps-agg-in-banner h4 { font-weight: 800; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-secondary); }
+
+/* Standings table (reused for PS) */
+.ps-standings-table { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; font-size: 0.82rem; }
+.ps-table-header {
+  display: grid;
+  grid-template-columns: 40px 1fr 36px 36px 36px 40px 48px;
+  background: var(--surface-raised);
+  padding: 5px 10px;
+  font-weight: 800;
+  font-size: 0.7rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  gap: 4px;
+}
+.ps-table-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 36px 36px 36px 40px 48px;
+  padding: 7px 10px;
+  gap: 4px;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.1s;
+}
+.ps-table-row:last-child { border-bottom: none; }
+.ps-table-row:hover { background: var(--surface-raised); }
+/* Aggregate table (fewer cols) */
+.ps-agg-in-banner .ps-table-header,
+.ps-agg-in-banner .ps-table-row {
+  grid-template-columns: 36px 1fr 36px 36px 50px;
+}
+
+.ps-rank { font-weight: 800; font-size: 0.88rem; }
+.ps-team-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ps-stat { text-align: center; font-variant-numeric: tabular-nums; }
+.ps-wins { font-weight: 800; color: var(--green-400, #4ade80); }
+.ps-diff { font-weight: 800; }
+.ps-gold   { background: rgba(251,191,36,0.07); }
+.ps-silver { background: rgba(148,163,184,0.07); }
+.ps-bronze { background: rgba(180,120,60,0.07); }
+
+/* Settings pre-season config */
+.preseason-toggle-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+}
+.toggle-label { font-weight: 700; color: var(--text-primary); }
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px; height: 28px;
+  flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider {
+  position: absolute; cursor: pointer; inset: 0;
+  background: var(--surface-raised);
+  border-radius: 28px;
+  transition: background 0.2s;
+  border: 1.5px solid var(--border-subtle);
+}
+.toggle-slider:before {
+  content: '';
+  position: absolute;
+  left: 3px; top: 3px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+}
+.toggle-switch input:checked + .toggle-slider { background: var(--accent); border-color: var(--accent); }
+.toggle-switch input:checked + .toggle-slider:before { transform: translateX(24px); }
+.preseason-options {
+  flex-direction: column;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1.5px solid var(--border-subtle);
+  gap: 0.5rem;
+}
+.ps-config-hint { font-size: 0.82rem; color: var(--text-tertiary); margin-bottom: 0.25rem; line-height: 1.5; }
+
+/* Auto-sim bar */
+.ps-autosim-bar {
+  margin: 0 var(--page-pad, 1rem) 1rem;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(249,115,22,0.12), rgba(245,158,11,0.12));
+  border: 2px solid rgba(249,115,22,0.4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.ps-autosim-label {
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: #f97316;
+}
+.ps-autosim-btns {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ps-autosim-btn {
+  font-size: 0.82rem;
+  padding: 6px 14px;
+}

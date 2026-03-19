@@ -42,10 +42,11 @@
       <span class="nav-title">CROSSY TOURNAMENT</span>
     </div>
     <div class="nav-actions">
-      <button class="nav-btn" id="btn-home"       onclick="showPage('home')">🏆 Bracket</button>
+      <button class="nav-btn" id="btn-home"        onclick="showPage('home')">🏆 Bracket</button>
+      <button class="nav-btn nav-btn-preseason hidden" id="btn-preseason" onclick="showPage('preseason')">🏅 Pre-Season</button>
       <button class="nav-btn" id="btn-leaderboard" onclick="showPage('leaderboard')">📊 Stats</button>
-      <button class="nav-btn" id="btn-history"    onclick="showPage('history')">📋 History</button>
-      <button class="nav-btn" id="btn-settings"   onclick="showPage('settings')">⚙︎ Settings</button>
+      <button class="nav-btn" id="btn-history"     onclick="showPage('history')">📋 History</button>
+      <button class="nav-btn" id="btn-settings"    onclick="showPage('settings')">⚙︎ Settings</button>
 
     </div>
   </nav>
@@ -96,6 +97,119 @@
     <div id="history-content"></div>
   </div>
 
+  <!-- ══ PRE-SEASON ══ -->
+  <div id="page-preseason" class="page">
+    <div class="page-header">
+      <h2 class="page-title">🏅 PRE-SEASON</h2>
+      <div class="header-right">
+        <div id="ps-progress-meta" class="tournament-meta"></div>
+      </div>
+    </div>
+
+    <!-- Season selector tabs -->
+    <div id="ps-season-tabs" class="ps-season-tabs"></div>
+
+    <!-- Season view: standings + game list -->
+    <div id="ps-season-view">
+      <!-- Live standings card -->
+      <div class="glass-card">
+        <h3 class="card-title" id="ps-standings-title">Season Standings</h3>
+        <div id="ps-standings-body"></div>
+      </div>
+
+      <!-- Game list for this season -->
+      <div class="glass-card">
+        <div class="ps-games-header">
+          <h3 class="card-title" id="ps-games-title">Games</h3>
+          <div class="ps-games-filter">
+            <button class="ps-filter-btn active" id="psf-all"     onclick="setPSFilter('all')">All</button>
+            <button class="ps-filter-btn"         id="psf-pending" onclick="setPSFilter('pending')">Pending</button>
+            <button class="ps-filter-btn"         id="psf-done"    onclick="setPSFilter('done')">Done</button>
+          </div>
+        </div>
+        <div id="ps-games-list"></div>
+      </div>
+
+      <!-- Finalize season / apply to bracket -->
+      <div id="ps-season-actions" class="ps-season-actions hidden"></div>
+
+      <!-- Auto-sim bar (shown when autosim enabled and pending games exist) -->
+      <div id="ps-autosim-bar" class="ps-autosim-bar hidden">
+        <span class="ps-autosim-label">⚡ Skip to results?</span>
+        <div class="ps-autosim-btns">
+          <button class="btn-warning ps-autosim-btn" onclick="autoSimSeason()">⚡ Sim This Season</button>
+          <button class="btn-primary ps-autosim-btn"  onclick="autoSimAll()">⚡⚡ Sim All Seasons</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- All seasons complete — seed bracket -->
+    <div id="ps-complete-banner" class="ps-complete-banner hidden">
+      <div class="ps-complete-inner">
+        <div class="ps-complete-trophy">🏅</div>
+        <h3>Pre-Season Complete!</h3>
+        <p>All seasons finished. Final standings are ready to seed the bracket.</p>
+        <button class="btn-primary btn-lg" onclick="applyPreseasonSeeds()">🏆 Seed the Bracket →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PRE-SEASON GAME ══ -->
+  <div id="page-ps-game" class="page">
+    <div class="page-header">
+      <button class="back-btn" onclick="showPage('preseason')">‹ Back</button>
+      <h2 class="page-title" id="ps-game-title">PRE-SEASON GAME</h2>
+      <div class="round-chip" id="ps-game-badge"></div>
+    </div>
+
+    <div id="match-timer-wrap-ps" class="match-timer-wrap hidden">
+      <div id="match-timer-display-ps" class="match-timer-display">0:00</div>
+      <div class="timer-controls">
+        <button class="btn-secondary btn-sm" onclick="startTimer()">▶ Start</button>
+        <button class="btn-secondary btn-sm" onclick="pauseTimer()">⏸ Pause</button>
+        <button class="btn-secondary btn-sm" onclick="resetTimer()">↺ Reset</button>
+      </div>
+    </div>
+
+    <div class="game-scoreboard glass-card-flat">
+      <div class="team-score-panel" id="ps-score-panel-a">
+        <div class="rank-chip" id="ps-rank-a"></div>
+        <div class="team-name" id="ps-score-name-a">Team A</div>
+        <div class="score-display" id="ps-score-val-a">0</div>
+        <div class="score-label">POINTS</div>
+      </div>
+      <div class="vs-col">
+        <div class="vs-text">VS</div>
+      </div>
+      <div class="team-score-panel" id="ps-score-panel-b">
+        <div class="rank-chip" id="ps-rank-b"></div>
+        <div class="team-name" id="ps-score-name-b">Team B</div>
+        <div class="score-display" id="ps-score-val-b">0</div>
+        <div class="score-label">POINTS</div>
+      </div>
+    </div>
+
+    <div class="winner-banner hidden" id="ps-winner-banner">🏅 <span id="ps-winner-name"></span> WINS!</div>
+
+    <div class="glass-card">
+      <h3 class="card-title">Add Points</h3>
+      <div class="score-entry-row">
+        <div class="score-entry-group"><label id="ps-entry-label-a">Team A</label><input type="number" id="ps-entry-pts-a" min="0" value="0"/></div>
+        <div class="score-sep">—</div>
+        <div class="score-entry-group"><label id="ps-entry-label-b">Team B</label><input type="number" id="ps-entry-pts-b" min="0" value="0"/></div>
+      </div>
+      <div class="score-entry-actions">
+        <button class="btn-secondary" onclick="psClearEntry()">Clear</button>
+        <button class="btn-primary"   onclick="psConfirmPoints()">✔ Confirm Points</button>
+      </div>
+    </div>
+
+    <div class="game-actions">
+      <button class="btn-warning"   onclick="psOpenDeclare()">🏅 Declare Winner</button>
+      <button class="btn-danger-sm" onclick="psResetScore()">↺ Reset Score</button>
+    </div>
+  </div>
+
   <!-- ══ SETTINGS ══ -->
   <div id="page-settings" class="page">
     <div class="page-header">
@@ -132,42 +246,44 @@
     </div>
 
     <!-- PRE-SEASON CARD -->
-    <div class="glass-card" id="preseason-settings-card">
+    <div class="glass-card">
       <h3 class="card-title">🏅 Pre-Season Mode</h3>
       <div class="form-group preseason-toggle-row">
-        <label class="toggle-label">Enable Pre-Season Simulation</label>
+        <label class="toggle-label">Enable Pre-Season Tab</label>
         <label class="toggle-switch">
-          <input type="checkbox" id="setting-preseason" onchange="togglePreseasonMode()"/>
+          <input type="checkbox" id="setting-preseason" onchange="saveSettings()"/>
           <span class="toggle-slider"></span>
         </label>
       </div>
-      <div id="preseason-options" class="preseason-options hidden">
-        <div class="form-group">
-          <label>Games Per Team <span class="opt">(per season)</span></label>
-          <input type="number" id="preseason-games" min="4" max="40" value="10" placeholder="10"/>
-        </div>
+      <div id="preseason-config" class="preseason-options" style="display:none">
+        <p class="ps-config-hint">Configure how many seasons to play and games per season. Each season generates a round-robin schedule you play like normal bracket matches. Final standings seed the bracket automatically.</p>
         <div class="form-group">
           <label>Number of Seasons</label>
-          <select id="preseason-seasons">
+          <select id="preseason-num-seasons">
             <option value="1">1 Season</option>
-            <option value="2">2 Seasons</option>
-            <option value="3" selected>3 Seasons</option>
-            <option value="5">5 Seasons</option>
+            <option value="2" selected>2 Seasons</option>
+            <option value="3">3 Seasons</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Home Court Advantage</label>
-          <select id="preseason-hca">
-            <option value="0">None</option>
-            <option value="5" selected>Mild (+5%)</option>
-            <option value="10">Strong (+10%)</option>
+          <label>Games Per Team Per Season</label>
+          <select id="preseason-games-per-team">
+            <option value="2">2 games (quick)</option>
+            <option value="4" selected>4 games</option>
+            <option value="6">6 games</option>
+            <option value="all">vs everyone once</option>
           </select>
         </div>
-        <div class="preseason-actions">
-          <button class="btn-primary" onclick="runPreseason()">▶ Run Pre-Season</button>
-          <button class="btn-secondary" onclick="clearPreseason()">✕ Clear Results</button>
+        <div class="form-group preseason-toggle-row" style="margin-top:4px">
+          <label class="toggle-label" style="font-size:0.9rem">⚡ Allow Auto-Sim Seasons</label>
+          <label class="toggle-switch">
+            <input type="checkbox" id="setting-autosim" onchange="saveSettings()"/>
+            <span class="toggle-slider"></span>
+          </label>
         </div>
-        <div id="preseason-status" class="preseason-status hidden"></div>
+        <p class="ps-config-hint" id="autosim-hint" style="display:none">When enabled, a <strong>⚡ Auto-Sim</strong> button appears on each season — it instantly simulates all remaining games with realistic random results so you can skip straight to seeding.</p>
+        <button class="btn-primary" onclick="initPreseason()">⚙ Generate Schedule</button>
+        <button class="btn-danger-sm" style="margin-left:8px" onclick="resetPreseason()">↺ Reset Pre-Season</button>
       </div>
     </div>
 
@@ -292,18 +408,15 @@
   </div>
 </div>
 
-<div id="modal-preseason-results" class="modal-overlay hidden">
-  <div class="modal modal-lg glass-modal">
-    <div class="modal-header">
-      <h3>🏅 Pre-Season Results</h3>
-      <button class="modal-close" onclick="closeModal('modal-preseason-results')">✕</button>
-    </div>
+<div id="modal-ps-winner" class="modal-overlay hidden">
+  <div class="modal modal-sm glass-modal">
+    <div class="modal-header"><h3>🏅 Declare Winner</h3><button class="modal-close" onclick="closeModal('modal-ps-winner')">✕</button></div>
     <div class="modal-body">
-      <div id="preseason-results-content"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('modal-preseason-results')">Close</button>
-      <button class="btn-primary" onclick="applyPreseasonSeeds(); closeModal('modal-preseason-results')">✅ Apply Seeds to Bracket</button>
+      <p class="modal-body-text" style="margin-bottom:1.2rem;">Who wins this game?</p>
+      <div class="winner-choice">
+        <button class="btn-primary" id="ps-modal-winner-a" onclick="psDeclareWinner('a')"></button>
+        <button class="btn-blue"    id="ps-modal-winner-b" onclick="psDeclareWinner('b')"></button>
+      </div>
     </div>
   </div>
 </div>

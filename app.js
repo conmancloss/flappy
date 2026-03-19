@@ -44,6 +44,8 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.getElementById('splash-screen').style.display = 'none';
     document.getElementById('app').classList.remove('hidden');
+    // Sync preseason nav button from persisted state
+    document.getElementById('btn-preseason').classList.toggle('hidden', !state.settings.preseasonEnabled);
     showPage('home');
     renderAll();
   }, 2900);
@@ -87,7 +89,7 @@ function showPage(name) {
   if (name === 'history')     renderHistory();
   if (name === 'preseason')   renderPreseasonPage();
 }
-function renderAll() { renderBracket(); renderSettings(); }
+function renderAll() { renderBracket(); }
 
 // ─── Undo ─────────────────────────────────────────────────────
 function snapshot() {
@@ -360,7 +362,7 @@ function renderSettings() {
 
 function saveSettings() {
   state.settings.name      = document.getElementById('setting-name').value.trim()      || 'Crossy Road Cup';
-  state.settings.numTeams  = parseInt(document.getElementById('setting-teams').value)  || 8;
+  const newNumTeams        = parseInt(document.getElementById('setting-teams').value)  || 8;
   state.settings.date      = document.getElementById('setting-date').value;
   state.settings.location  = document.getElementById('setting-location').value.trim();
   state.settings.timerSecs = parseInt(document.getElementById('setting-timer').value)  || 0;
@@ -379,16 +381,36 @@ function saveSettings() {
   const hintEl = document.getElementById('autosim-hint');
   if (hintEl) hintEl.style.display = (asEl && asEl.checked) ? 'block' : 'none';
 
-  if (state.teams.length > state.settings.numTeams) {
-    state.teams = state.teams.slice(0, state.settings.numTeams);
-    renumber();
-    showToast('Teams trimmed to ' + state.settings.numTeams + '.', 'info');
+  // Only trim teams / rebuild bracket if the team cap actually changed
+  if (newNumTeams !== state.settings.numTeams) {
+    state.settings.numTeams = newNumTeams;
+    if (state.teams.length > state.settings.numTeams) {
+      snapshot();
+      state.teams = state.teams.slice(0, state.settings.numTeams);
+      renumber();
+      showToast('Teams trimmed to ' + state.settings.numTeams + '.', 'info');
+      saveState();
+      buildBracket();
+    } else {
+      state.settings.numTeams = newNumTeams;
+      saveState();
+      renderBracket();
+    }
+  } else {
+    state.settings.numTeams = newNumTeams;
+    saveState();
   }
-  saveState();
-  buildBracket();
+
+  // Update meta display without re-rendering the whole settings form
+  const meta = document.getElementById('tournament-meta');
+  if (meta) {
+    meta.textContent = state.settings.name
+      + (state.settings.date     ? '  •  ' + state.settings.date     : '')
+      + (state.settings.location ? '  •  ' + state.settings.location : '');
+  }
+
   const msg = document.getElementById('settings-saved-msg');
-  msg.classList.remove('hidden');
-  setTimeout(() => msg.classList.add('hidden'), 3000);
+  if (msg) { msg.classList.remove('hidden'); setTimeout(() => msg.classList.add('hidden'), 3000); }
   showToast('Settings saved!', 'success');
 }
 
